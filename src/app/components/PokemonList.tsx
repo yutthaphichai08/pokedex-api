@@ -27,27 +27,18 @@ export default function PokemonList() {
   const [pokemonList, setPokemonList] = useState<PokemonDetails[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [page, setPage] = useState<number>(0);
-  const [hasMore, setHasMore] = useState<boolean>(true);
-  const limit = 20;
 
   useEffect(() => {
     fetchPokemonList();
-  }, [page]);
+  }, []);
 
-  const apiUrl = `https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${
-    page * limit
-  }`;
+  const apiUrl = `https://pokeapi.co/api/v2/pokemon?limit=151&offset=0`;
 
   const fetchPokemonList = async () => {
     try {
       const response = await fetch(apiUrl);
       const data = await response.json();
       const results: Pokemon[] = data.results;
-
-      if (results.length < limit) {
-        setHasMore(false);
-      }
 
       const pokemonDetailsPromises = results.map(async (pokemon) => {
         const pokemonResponse = await fetch(pokemon.url);
@@ -56,7 +47,7 @@ export default function PokemonList() {
       });
 
       const pokemonDetailsList = await Promise.all(pokemonDetailsPromises);
-      setPokemonList((prevList) => [...prevList, ...pokemonDetailsList]);
+      setPokemonList(pokemonDetailsList);
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching Pokémon data:", error);
@@ -70,12 +61,6 @@ export default function PokemonList() {
   const filteredPokemonList = pokemonList.filter((pokemon) =>
     pokemon.name.toLowerCase().includes(searchQuery)
   );
-
-  const handleLoadMore = () => {
-    if (hasMore) {
-      setPage((prevPage) => prevPage + 1);
-    }
-  };
 
   return (
     <div className="App" style={{ backgroundColor: "#f8f8f8;" }}>
@@ -109,13 +94,12 @@ export default function PokemonList() {
           )}
         </div>
       )}
-      {hasMore && !isLoading && (
-        <div style={{ marginTop: "20px" }}>
-          <Button onClick={handleLoadMore} type="primary">
-            Load More
-          </Button>
-        </div>
-      )}
+
+      {/* <div style={{ marginTop: "20px" }}>
+        <Button onClick={() => {}} type="primary">
+          Load More
+        </Button>
+      </div> */}
     </div>
   );
 }
