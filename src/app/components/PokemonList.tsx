@@ -53,7 +53,6 @@ export default function PokemonList() {
       const response = await fetch(apiUrl);
       const data = await response.json();
       const results: Pokemon[] = data.results;
-      console.log("results", results);
       const pokemonDetailsPromises = results.map(async (pokemon) => {
         const pokemonResponse = await fetch(pokemon.url);
         const pokemonDetails: PokemonDetails = await pokemonResponse.json();
