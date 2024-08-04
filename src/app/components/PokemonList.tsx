@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import PokemonCard from "./PokemonCard";
-import { Spin, Button } from "antd";
+import { Spin } from "antd";
 
 interface Pokemon {
   name: string;
@@ -27,10 +27,24 @@ export default function PokemonList() {
   const [pokemonList, setPokemonList] = useState<PokemonDetails[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [filteredPokemonList, setFilteredPokemonList] = useState<
+    PokemonDetails[]
+  >([]);
 
   useEffect(() => {
     fetchPokemonList();
   }, []);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      const filteredList = pokemonList.filter((pokemon) =>
+        pokemon.name.toLowerCase().includes(searchQuery)
+      );
+      setFilteredPokemonList(filteredList);
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, pokemonList]);
 
   const apiUrl = `https://pokeapi.co/api/v2/pokemon?limit=50&offset=0`;
 
@@ -39,7 +53,7 @@ export default function PokemonList() {
       const response = await fetch(apiUrl);
       const data = await response.json();
       const results: Pokemon[] = data.results;
-
+      console.log("results", results);
       const pokemonDetailsPromises = results.map(async (pokemon) => {
         const pokemonResponse = await fetch(pokemon.url);
         const pokemonDetails: PokemonDetails = await pokemonResponse.json();
@@ -48,6 +62,7 @@ export default function PokemonList() {
 
       const pokemonDetailsList = await Promise.all(pokemonDetailsPromises);
       setPokemonList(pokemonDetailsList);
+      setFilteredPokemonList(pokemonDetailsList);
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching Pokémon data:", error);
@@ -58,12 +73,8 @@ export default function PokemonList() {
     setSearchQuery(e.target.value.toLowerCase());
   };
 
-  const filteredPokemonList = pokemonList.filter((pokemon) =>
-    pokemon.name.toLowerCase().includes(searchQuery)
-  );
-
   return (
-    <div className="App" style={{ backgroundColor: "#f8f8f8;" }}>
+    <div className="App" style={{ backgroundColor: "#f8f8f8" }}>
       <h1>Pokémon List</h1>
 
       <input
