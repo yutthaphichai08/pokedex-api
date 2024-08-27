@@ -95,6 +95,39 @@ body {
   z-index: 999;
 }
 
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.pagination-controls button {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #007bff;
+  color: #fff;
+  transition: background-color 0.3s;
+}
+
+.pagination-controls button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.pagination-controls button:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+.pagination-controls span {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  color: #333;
+}
+
 .pokemon-type.normal {
   background-color: #a8a77a;
 }
